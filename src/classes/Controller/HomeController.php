@@ -9,7 +9,8 @@ class HomeController extends Controller {
         $countBooks = $this->db->selectValue($sql);
 
         $templateValues = [
-            'countBooks' => $countBooks
+            'countBooks' => $countBooks,
+            'mainTitle' => 'Home'
         ];
 
         return $this->view->render($response, 'home.phtml', $templateValues);

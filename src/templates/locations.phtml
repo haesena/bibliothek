@@ -1,25 +1,38 @@
-<table>
-	<tr>
-		<th>Location</th>
-		<th>Room</th>
-		<th>Storage</th>
-		<th></th>
-	</tr>
+<div class="mdc-data-table">
+    <table class="mdc-data-table__table">
+    	<tr class="mdc-data-table__header-row">
+    		<th class="mdc-data-table__header-cell">Location</th>
+    		<th class="mdc-data-table__header-cell">Room</th>
+    		<th class="mdc-data-table__header-cell">Storage</th>
+            <th class="mdc-data-table__header-cell"></th>
+    	</tr>
 
-<?php foreach ($locations as $location): ?>
+    <tbody class="mdc-data-table__content">
+    <?php foreach ($locations as $location): ?>
 
-    <tr>
-        <td><?=$location['location'] ?></td>
-        <td><?=$location['room'] ?></td>
-        <td><?=$location['storage'] ?></td>
-        <td>
-            <a href="<?=$router->urlFor('location-detail', ['id' => $location['loc_id']])?>">details</a>
-        </td>
-    </tr>
+        <tr class="mdc-data-table__row" onclick="window.location = '<?=$router->urlFor('location-detail', ['id' => $location['loc_id']])?>'">
+            <td class="mdc-data-table__cell"><?=$location['location'] ?></td>
+            <td class="mdc-data-table__cell"><?=$location['room'] ?></td>
+            <td class="mdc-data-table__cell"><?=$location['storage'] ?></td>
+            <td>
+                <a href="<?=$router->urlFor('location-delete', ['id' => $location['loc_id']])?>" class="mdc-icon-button material-icons">delete</a>
+            </td>
+        </tr>
 
-<?php endforeach; ?>
+    <?php endforeach; ?>
+    </tbody>
 
-</table>
+    </table>
+</div>
 
+<br><br>
 
-<a href="<?=$router->urlFor('home')?>">Back</a>
+<a class="mdc-button" href="<?=$router->urlFor('locations-new')?>">
+  <div class="mdc-button__ripple"></div>
+  <span class="mdc-button__label">New</span>
+</a>
+
+<a class="mdc-button" href="<?=$router->urlFor('home')?>">
+  <div class="mdc-button__ripple"></div>
+  <span class="mdc-button__label">Back</span>
+</a>

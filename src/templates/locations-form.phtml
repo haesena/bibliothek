@@ -1,0 +1,54 @@
+<form action="<?=$router->urlFor('location-save')?>" method="post">
+	<div class="mdc-text-field mdc-text-field--outlined" id="input-location">
+		<input class="mdc-text-field__input" type="text" id="text-field-location" name="location" value="<?=$location['location'] ?>">
+		<div class="mdc-notched-outline">
+			<div class="mdc-notched-outline__leading"></div>
+			<div class="mdc-notched-outline__notch">
+				<label for="text-field-location" class="mdc-floating-label">Location</label>
+			</div>
+			<div class="mdc-notched-outline__trailing"></div>
+		</div>
+	</div>
+
+	<div class="mdc-text-field mdc-text-field--outlined" id="input-room">
+		<input class="mdc-text-field__input" type="text" id="text-field-room" name="room" value="<?=$location['room'] ?>">
+		<div class="mdc-notched-outline">
+			<div class="mdc-notched-outline__leading"></div>
+			<div class="mdc-notched-outline__notch">
+				<label for="text-field-room" class="mdc-floating-label">Room</label>
+			</div>
+			<div class="mdc-notched-outline__trailing"></div>
+		</div>
+	</div>
+
+	<div class="mdc-text-field mdc-text-field--outlined" id="input-storage">
+		<input class="mdc-text-field__input" type="text" id="text-field-storage" name="storage" value="<?=$location['storage'] ?>">
+		<div class="mdc-notched-outline">
+			<div class="mdc-notched-outline__leading"></div>
+			<div class="mdc-notched-outline__notch">
+				<label for="text-field-storage" class="mdc-floating-label">Storage</label>
+			</div>
+			<div class="mdc-notched-outline__trailing"></div>
+		</div>
+	</div>
+
+	<input type="hidden" name="id" value="<?=$location['loc_id'] ?>">
+
+	<br><br>
+
+	<button type="submit" class="mdc-button mdc-button--raised">
+		<div class="mdc-button__ripple"></div>
+		<span class="mdc-button__label">Save</span>
+	</button>
+	<a class="mdc-button" href="<?=$router->urlFor('locations')?>">
+		<div class="mdc-button__ripple"></div>
+		<span class="mdc-button__label">Back</span>
+	</a>
+</form>
+
+
+<script>
+	new mdc.textField.MDCTextField(document.getElementById('input-location'));
+	new mdc.textField.MDCTextField(document.getElementById('input-room'));
+	new mdc.textField.MDCTextField(document.getElementById('input-storage'));
+</script>
