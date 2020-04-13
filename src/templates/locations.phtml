@@ -1,0 +1,25 @@
+<table>
+	<tr>
+		<th>Location</th>
+		<th>Room</th>
+		<th>Storage</th>
+		<th></th>
+	</tr>
+
+<?php foreach ($locations as $location): ?>
+
+    <tr>
+        <td><?=$location['location'] ?></td>
+        <td><?=$location['room'] ?></td>
+        <td><?=$location['storage'] ?></td>
+        <td>
+            <a href="<?=$router->urlFor('location-detail', ['id' => $location['loc_id']])?>">details</a>
+        </td>
+    </tr>
+
+<?php endforeach; ?>
+
+</table>
+
+
+<a href="<?=$router->urlFor('home')?>">Back</a>
