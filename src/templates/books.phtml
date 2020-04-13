@@ -13,8 +13,8 @@
                     <td><?=$book['author'] ?></td>
                     <td><?=$book['published_year'] ?></td>
                     <td class="icon-cell">
-                        <a href="<?=$router->urlFor('book-detail', ['id' => $book['book_id']])?>" class="btn btn-primary material-icons">create</a>
-                        <a href="<?=$router->urlFor('book-delete', ['id' => $book['book_id']])?>" class="btn btn-primary material-icons">delete</a>
+                        <a href="<?=$router->urlFor('book-detail', ['id' => $book['book_id']])?>" class="btn btn-primary btn-circle material-icons">create</a>
+                        <a href="<?=$router->urlFor('book-delete', ['id' => $book['book_id']])?>" class="btn btn-primary btn-circle material-icons">delete</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
