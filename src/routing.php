@@ -10,4 +10,13 @@ $app->get('/locations/{id}/delete', Controller\LocationController::class . ':del
 
 $app->get('/books', Controller\BookController::class . ':getBooks')->setName('books');
 $app->get('/books/new', Controller\BookController::class . ':newBook')->setName('book-new');
+$app->post('/books/save', Controller\BookController::class . ':saveBook')->setName('book-save');
 $app->get('/books/{id}', Controller\BookController::class . ':getSingleBook')->setName('book-detail');
+$app->get('/books/{id}/delete', Controller\BookController::class . ':deleteBook')->setName('book-delete');
+
+
+$app->get('/genre', Controller\GenreController::class . ':getGenre')->setName('genre');
+$app->get('/genre/new', Controller\GenreController::class . ':newGenre')->setName('genre-new');
+$app->post('/genre/save', Controller\GenreController::class . ':saveGenre')->setName('genre-save');
+$app->get('/genre/{id}', Controller\GenreController::class . ':getSingleGenre')->setName('genre-detail');
+$app->get('/genre/{id}/delete', Controller\GenreController::class . ':deleteGenre')->setName('genre-delete');

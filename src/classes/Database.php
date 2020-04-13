@@ -35,13 +35,33 @@ class Database {
 		}
 
 		$colNames = implode(', ', array_keys($values));
-		$placeholders = implode(', ', array_fill(0, count($values), '?'));
+
+		$preparedValues = $placeholders = [];
+		foreach($values as $val) {
+			if(mb_strlen($val) == 0) {
+				$placeholders[]= "NULL";
+			} else {
+				$placeholders[]= "?";
+				$preparedValues[]= $val;
+			}
+		}
+
+		$placeholders = implode(', ', $placeholders);
 
 		$sql = "INSERT INTO ".$table." (".$colNames.") VALUES(".$placeholders.")";
 
-		$query = $this->pdo->prepare($sql);
-		$query->execute(array_values($values));
+		try {
+			$query = $this->pdo->prepare($sql);
+			$query->execute($preparedValues);
+		} catch(Exception $e) {
+			print $e->getMessage()."<br>";
+			print "Fehler beim Ausführen des INSERT:<br>";
+			print $sql;
+			print "<br>".print_r($values, true);
 
+			exit();
+		}
+		
 		return true;
 	}
 
