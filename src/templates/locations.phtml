@@ -17,6 +17,7 @@
                     <td><?=$location['storage'] ?></td>
                     <td class="icon-cell">
                         <a href="<?=$router->urlFor('location-detail', ['id' => $location['loc_id']])?>" class="btn btn-primary btn-circle material-icons">create</a>
+                        <a href="<?=$router->urlFor('location-copy', ['id' => $location['loc_id']])?>" class="btn btn-primary btn-circle material-icons">file_copy</a>
                         <a href="<?=$router->urlFor('location-delete', ['id' => $location['loc_id']])?>" class="btn btn-primary btn-circle material-icons">delete</a>
                     </td>
                 </tr>

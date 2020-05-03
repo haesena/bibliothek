@@ -13,6 +13,7 @@
 					<td><?=$genre['sub_genre'] ?></td>
 					<td class="icon-cell">
 	                    <a href="<?=$router->urlFor('genre-detail', ['id' => $genre['genre_id']])?>" class="btn btn-primary btn-circle material-icons">create</a>
+	                    <a href="<?=$router->urlFor('genre-copy', ['id' => $genre['genre_id']])?>" class="btn btn-primary btn-circle material-icons">file_copy</a>
 	                    <a href="<?=$router->urlFor('genre-delete', ['id' => $genre['genre_id']])?>" class="btn btn-primary btn-circle material-icons">delete</a>
 					</td>
 				</tr>

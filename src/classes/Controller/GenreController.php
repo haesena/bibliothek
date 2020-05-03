@@ -10,7 +10,7 @@ class GenreController extends Controller {
     public function getGenre($request, $response, $args) {
 
         // Hole alle genres aus der Datenbank
-        $array_genre = $this->db->select("SELECT * FROM genre");
+        $array_genre = $this->db->select("SELECT * FROM genre ORDER BY genre, sub_genre");
 
         // Vairablen welche dem HTML übergeben werden sollen
         $templateValues = [
@@ -22,36 +22,36 @@ class GenreController extends Controller {
         // HTML-View anyeigen
         return $this->view->render($response, 'genre.phtml', $templateValues);
     }
-/*
+
     // Diese Funktion wird als Callback zur Route /locations/{id} aufgerufen
-    public function getSingleLocation($request, $response, $args) {
+    public function getSinglegenre($request, $response, $args) {
 
-        $locationId = $args['id'];
+        $genreId = $args['id'];
 
-        // Fehler abfangen falls Book-ID nicht numerisch ist
-        if(!is_numeric($locationId)) {
-            $response->getBody()->write("ERROR: Invalid bookId, must be numeric");
+        // Fehler abfangen falls Genre-ID nicht numerisch ist
+        if(!is_numeric($genreId)) {
+            $response->getBody()->write("ERROR: Invalid genreId, must be numeric");
             return $response;
         }
 
-        $locations = $this->db->select("SELECT * FROM location WHERE loc_id = :id", [':id' => $locationId]);
+        $genre = $this->db->select("SELECT * FROM genre WHERE genre_id = :id", [':id' => $genreId]);
 
-        if(count($locations) != 1) {
-            $response->getBody()->write("ERROR: no location found for locationId {$locationId}");
+        if(count($genre) != 1) {
+            $response->getBody()->write("ERROR: no genre found for genreId {$genreId}");
             return $response;
         } else {
-            $location = current($locations);
+            $sgenre = current($genre);
         }
 
         // Vairablen welche dem HTML übergeben werden sollen
         $templateValues = [
-            'mainTitle' => 'Edit location',
-            'location' => $location
+            'mainTitle' => 'Edit genre',
+            'genre' => $sgenre
         ];
         // HTML-View anyeigen
-        return $this->view->render($response, 'locations-form.phtml', $templateValues);
+        return $this->view->render($response, 'genre-form.phtml', $templateValues);
     }
-*/
+
     public function newGenre($request, $response, $args) {
         // Vairablen welche dem HTML übergeben werden sollen
         $templateValues = [
@@ -61,6 +61,31 @@ class GenreController extends Controller {
         return $this->view->render($response, 'genre-form.phtml', $templateValues);
     }
 
+    public function copyGenre($request, $response, $args) {
+
+        $genreId = $args['id'];
+
+        // Fehler abfangen falls Genre-ID nicht numerisch ist
+        if(!is_numeric($genreId)) {
+            $response->getBody()->write("ERROR: Invalid genreId, must be numeric");
+            return $response;
+        }
+
+        $genre = $this->db->selectValue("SELECT genre FROM genre WHERE genre_id = :id", [':id' => $genreId]);
+
+        
+        //$sgenre [ 'sub_genre' ] = '';
+
+        // Vairablen welche dem HTML übergeben werden sollen
+        $templateValues = [
+            'mainTitle' => 'New genre (copy)',
+            'genre'  => [ 'genre' => $genre ]
+        //     'genre' => [ 'genre' => $sgenre[ 'genre' ] ] 
+        ];
+
+        // HTML-View anyeigen
+        return $this->view->render($response, 'genre-form.phtml', $templateValues);
+    }
 
     public function saveGenre($request, $response, $args) {
         $body = $request->getParsedBody();

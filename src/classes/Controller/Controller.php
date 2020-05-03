@@ -5,9 +5,13 @@ namespace Controller;
 use Psr\Container\ContainerInterface;
 
 class Controller {
+    /** @var ContainerInterface  */
     protected $container;
+    /** @var \Database  */
     protected $db;
+    /** @var \Slim\Views\PhpRenderer  */
     protected $view;
+    /** @var \Slim\Interfaces\RouteParserInterface  */
     protected $router;
     protected $basePath;
 
@@ -21,7 +25,6 @@ class Controller {
 
 		// Den Router aus der globalen $app auslesen
 		$this->router = $app->getRouteCollector()->getRouteParser();
-
 		$this->basePath = $app->getBasePath();
 
 		// Da der router oft benutzt wird, wird dieser standardmässig an die View übergeben

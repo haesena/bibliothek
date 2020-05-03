@@ -10,7 +10,7 @@ class LocationController extends Controller {
     public function getLocations($request, $response, $args) {
 
         // Hole alle Locations aus der Datenbank
-        $locations = $this->db->select("SELECT * FROM location");
+        $locations = $this->db->select("SELECT * FROM location ORDER BY room, storage");
 
         // Vairablen welche dem HTML übergeben werden sollen
         $templateValues = [
@@ -47,6 +47,38 @@ class LocationController extends Controller {
             'mainTitle' => 'Edit location',
             'location' => $location
         ];
+        // HTML-View anyeigen
+        return $this->view->render($response, 'locations-form.phtml', $templateValues);
+    }
+
+    public function copyLocation($request, $response, $args) {
+
+        $locationId = $args['id'];
+
+        // Fehler abfangen falls Genre-ID nicht numerisch ist
+        if(!is_numeric($locationId)) {
+            $response->getBody()->write("ERROR: Invalid locationId, must be numeric");
+            return $response;
+        }
+
+
+        $locations = $this->db->select("SELECT location, room, storage FROM location WHERE loc_id = :id", [':id' => $locationId]);
+
+        if(count($locations) != 1) {
+            $response->getBody()->write("ERROR: no location found for locationId {$locationId}");
+            return $response;
+        } else {
+            $location = current($locations);
+        }
+        
+        //$locations [ 'storage' ] = '';
+
+        // Vairablen welche dem HTML übergeben werden sollen
+        $templateValues = [
+            'mainTitle' => 'New genre (copy)',
+            'location' => $location
+        ];
+
         // HTML-View anyeigen
         return $this->view->render($response, 'locations-form.phtml', $templateValues);
     }

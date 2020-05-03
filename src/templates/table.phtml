@@ -1,0 +1,51 @@
+<?php
+/** @var $cols array Das Array mit den Spaltendefinitionen */
+/** @var $data array Ein 2-Dimensionales Array, jeder Eintrag entspricht einer Tabellen-Reihe */
+/** @var $router \Slim\Interfaces\RouteParserInterface Der Slim-Router */
+
+/** @var $newUrl string URL um einen neuen Eintrag anzulegen */
+/** @var $detailUrl string URL um die Details eines Eintrag anzuschauen */
+/** @var $copyUrl string URL um einen Eintrag zu kopieren */
+/** @var $deleteUrl string URL um einen Eintrag zu löschen */
+?>
+<table class="table">
+    <?php $colCount = 0; ?>
+    <tr>
+        <?php foreach ($cols as $col): ?>
+            <th><?=$col['title'] ?></th>
+        <?php endforeach; ?>
+        <th style="width: 120px;"></th>
+    </tr>
+    <tbody>
+    <?php if(count($data) > 0): ?>
+        <?php foreach ($data as $row): ?>
+            <tr>
+                <?php foreach ($cols as $col): ?>
+                    <td><?=$row[$col['alias']] ?></td>
+                <?php endforeach; ?>
+                <td class="icon-cell">
+                    <?php if($detailUrl !== null): ?>
+                        <a href="<?=$router->urlFor($detailUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">create</a>
+                    <?php endif; ?>
+                    <?php if($copyUrl !== null): ?>
+                        <a href="<?=$router->urlFor($copyUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">file_copy</a>
+                    <?php endif; ?>
+                    <?php if($deleteUrl !== null): ?>
+                        <a href="<?=$router->urlFor($deleteUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">delete</a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="<?=count($cols) ?>" style="text-align: center;"><i>No data found</i></td>
+        </tr>
+    <?php endif; ?>
+    </tbody>
+
+</table>
+
+<?php if($newUrl !== null): ?>
+    <a type="button" class="btn btn-primary" href="<?=$router->urlFor($newUrl)?>">New</a>
+<?php endif; ?>
+<a type="button" class="btn btn-primary" href="<?=$router->urlFor('home')?>">Back</a>

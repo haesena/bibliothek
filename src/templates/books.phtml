@@ -1,19 +1,26 @@
 <table class="table">
 	<tr>
-		<th>Title</th>
 		<th>Author</th>
-		<th>Year</th>
+        <th>Title</th>
+        <th>Year</th>
+        <th>Language</th>
+        <th>Genre</th>
+        <th>Location</th>
         <th style="width: 120px;"></th>
 	</tr>
     <tbody>
         <?php if(count($books) > 0): ?>
             <?php foreach ($books as $book): ?>
                 <tr>
-                    <td><?=$book['title'] ?></td>
                     <td><?=$book['author'] ?></td>
+                    <td><?=$book['title'] ?></td>
                     <td><?=$book['published_year'] ?></td>
+                    <td><?=$book['language'] ?></td>
+                    <td><?=$book['genre'] ?></td>
+                    <td><?=$book['location'] ?></td>
                     <td class="icon-cell">
                         <a href="<?=$router->urlFor('book-detail', ['id' => $book['book_id']])?>" class="btn btn-primary btn-circle material-icons">create</a>
+                        <a href="<?=$router->urlFor('book-copy', ['id' => $book['book_id']])?>" class="btn btn-primary btn-circle material-icons">file_copy</a>
                         <a href="<?=$router->urlFor('book-delete', ['id' => $book['book_id']])?>" class="btn btn-primary btn-circle material-icons">delete</a>
                     </td>
                 </tr>

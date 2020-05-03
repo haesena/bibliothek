@@ -16,6 +16,17 @@
 				<label for="input-year" class="bmd-label-floating">Year (YYYY)</label>
 				<input class="form-control" type="text" id="input-year" name="year" value="<?=$book['published_year'] ?>"  pattern="^\d{4}$">
 			</div>
+			
+			<div class="form-group">
+				<label for="input-language" class="bmd-label-floating">Language</label>
+				<select class="form-control" id="input-language" name="language">
+					<?php foreach ($languages as $lang): ?>
+						<option value="<?=$lang ?>" label="<?=$lang ?>" <?php if($lang == $book['language']): ?>selected <?php endif; ?>>
+							<?=$lang ?>
+						</option>
+					<?php endforeach; ?>
+				</select>
+			</div>
 
 			<div class="form-group">
 				<label for="input-location" class="bmd-label-floating">Location</label>

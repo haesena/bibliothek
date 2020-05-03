@@ -7,25 +7,37 @@ use Psr\Container\ContainerInterface;
 class BookController extends Controller {
 
     public function getBooks($request, $response, $args) {
+        $table = new \Table($this->db, $this->view);
+        $table->setUrls('book');
+        $table
+            ->setDBTable("book", "b")
+            ->addJoin("genre", "g", "b.genre_id = g.genre_id")
+            ->addJoin("location", "l", "b.loc_id = l.loc_id")
 
-        $books = $this->db->select("SELECT * FROM book");
+            ->setIdCol("b.book_id")
+
+            ->addColum("b.author", "Author")
+            ->addColum("b.title", "Title")
+            ->addColum("b.published_year", "Year")
+            ->addColum("b.language", "Language")
+            ->addColum("g.genre", "Genre")
+            ->addColum("l.location", "Location");
+
         // Vairablen welche dem HTML übergeben werden sollen
         $templateValues = [
-            'books' => $books,
             'mainTitle' => 'Books'
         ];
-        //$this->log($genre,'genresHH');
 
-        // HTML-View anyeigen
-        return $this->view->render($response, 'books.phtml', $templateValues);
+        return $table->printTable($response, $templateValues);
     }
-
+    
     public function newBook($request, $response, $args) {
         // Vairablen welche dem HTML übergeben werden sollen
         $templateValues = [
             'mainTitle' => 'New book',
             'locations' => $this->getLocationsList(),
-            'genres' => $this->getGenresList()
+            'genres' => $this->getGenresList(),
+            'languages' => $this->getLanguage()
         ];
         // HTML-View anyeigen
         return $this->view->render($response, 'books-form.phtml', $templateValues);
@@ -63,13 +75,51 @@ class BookController extends Controller {
             'mainTitle' => 'New book',
             'book' => $book,
             'locations' => $this->getLocationsList(),
-            'genres' => $this->getGenresList()
+            'genres' => $this->getGenresList(),
+            'languages' => $this->getLanguage()
         ];
         // HTML-View anyeigen
         return $this->view->render($response, 'books-form.phtml', $templateValues);
 
         return $response;
     }
+
+    public function copyBook($request, $response, $args) {
+
+        $bookId = $args['id'];
+
+        // Fehler abfangen falls Book-ID nicht numerisch ist
+        if(!is_numeric($bookId)) {
+            $response->getBody()->write("ERROR: Invalid bookId, must be numeric");
+            return $response;
+        }
+
+
+        $books = $this->db->select("SELECT author, language, genre_id, loc_id FROM book WHERE book_id = :id", [':id' => $bookId]);
+
+        if(count($books) != 1) {
+            $response->getBody()->write("ERROR: no book found for bookId {$bookId}");
+            return $response;
+        } else {
+            $book = current($books);
+        }
+        
+        //$locations [ 'storage' ] = '';
+
+        // Vairablen welche dem HTML übergeben werden sollen
+        $templateValues = [
+            'mainTitle' => 'New genre (copy)',
+            'book' => $book,
+            'locations' => $this->getLocationsList(),
+            'genres' => $this->getGenresList(),
+            'languages' => $this->getLanguage()
+
+        ];
+
+        // HTML-View anyeigen
+        return $this->view->render($response, 'books-form.phtml', $templateValues);
+    }
+
 
     public function saveBook($request, $response, $args) {
         $body = $request->getParsedBody();
@@ -137,4 +187,13 @@ class BookController extends Controller {
 
         return $genres;
     }
+
+    private function getLanguage() {
+        return ['en','de','fr'];
+
+
+    }
+
+
+
 }

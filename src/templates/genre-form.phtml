@@ -1,0 +1,25 @@
+<div class="card form-card">
+	<div class="card-body">
+		<form action="<?=$router->urlFor('genre-save')?>" method="post">
+
+			<div class="form-group">
+				<label for="input-genre" class="bmd-label-floating">genre</label>
+				<input class="form-control" type="text" id="input-genre" name="genre" value="<?=$genre['genre'] ?>">
+			</div>
+
+			<div class="form-group">
+				<label for="input-sub_genre" class="bmd-label-floating">sub_genre</label>
+				<input class="form-control" type="text" id="input-sub_genre" name="sub_genre" value="<?=$genre['sub_genre'] ?>">
+			</div>
+
+
+			<input type="hidden" name="id" value="<?=$genre['genre_id'] ?>">
+
+			<div class="btn-group" role="group" aria-label="Genre Actions">
+			    <button type="submit" class="btn btn-primary">Save</button>
+			    <a class="btn btn-primary" href="<?=$router->urlFor('genre')?>">Back</a>
+			</div>
+
+		</form>
+	</div>
+</div>
