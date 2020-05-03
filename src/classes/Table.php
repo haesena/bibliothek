@@ -9,8 +9,6 @@ class Table {
     private $view;
     /** @var \Slim\Interfaces\RouteParserInterface */
     private $router;
-    /** @var string */
-    private $urlBase;
 
     /** @var string die Haupttabelle aus welcher die Daten gelesen werden */
 	private $databaseTable = null;
@@ -20,16 +18,31 @@ class Table {
 	private $idCol;
 	private $columns = [];
 
+	/** @var array  */
+	private $columnFilter = [];
+
+
+	/** @var \Slim\Psr7\Request */
+	private $request;
+	/** @var \Slim\Psr7\Response */
+    private $response;
+
     /**
      * Table constructor.
      * @param Database $database
      * @param \Slim\Views\PhpRenderer $view
+     * @param \Slim\Psr7\Request $request
+     * @param \Slim\Psr7\Response $response
      */
-	function __construct($database, $view) {
+	function __construct($database, $view, $request, $response) {
 		$this->db = $database;
 		$this->view = $view;
 
 		$this->router = $view->getAttribute('router');
+		$this->request = $request;
+		$this->response = $response;
+
+        $this->view->addAttribute('currentUrl', $request->getAttribute('route'));
 	}
 
 	public function setUrls($urlBase) {
@@ -81,7 +94,7 @@ class Table {
 		return $this;
 	}
 
-	private function getSQL() {
+	private function getData() {
 
         $collist = [$this->idCol." AS id"];
         foreach($this->columns as $i => $col) {
@@ -97,21 +110,48 @@ class Table {
             $sql.= implode("\n", $this->joins);
         }
 
-        return $sql;
+        list($filter, $filterValues) = $this->getFilterSQL();
+
+        if(count($filter) > 0) {
+            $sql.= " WHERE ".implode(" AND ", $filter);
+        }
+
+        $data = $this->db->select($sql, $filterValues);
+        return $data;
+    }
+
+    private function getFilterSQL() {
+
+        $filter = [];
+        $filterValues = [];
+
+        $queryParams = $this->request->getQueryParams();
+        foreach($this->columns as $col) {
+            $filterCol = "filter-".$col['alias'];
+            if(strlen($queryParams[$filterCol]) === 0) {
+                continue;
+            }
+            $filterValues[":filter_{$col['alias']}"] = "%".$queryParams[$filterCol]."%";
+            $filter[]= "CAST({$col['sql']} AS CHAR(255)) LIKE :filter_{$col['alias']}";
+
+            $this->columnFilter[$col['alias']] = $queryParams[$filterCol];
+        }
+
+        return [$filter, $filterValues];
     }
 
     /**
-     * @param ResponseInterface $response
      * @param array $templateValues
      */
-	public function printTable($response, $templateValues) {
-        $sql = $this->getSQL();
+	public function printTable($templateValues) {
+        $data = $this->getData();
 
-        $templateValues['data'] = $this->db->select($sql);
+        $templateValues['data'] = $data;
         $templateValues['cols'] = $this->columns;
-
+        $templateValues['filters'] = $this->columnFilter;
+        $templateValues['filterSet'] = count($this->columnFilter) > 0;
 
         // HTML-View anzeigen
-        return $this->view->render($response, 'table.phtml', $templateValues);
+        return $this->view->render($this->response, 'table.phtml', $templateValues);
 	}
 }

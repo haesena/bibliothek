@@ -3,49 +3,82 @@
 /** @var $data array Ein 2-Dimensionales Array, jeder Eintrag entspricht einer Tabellen-Reihe */
 /** @var $router \Slim\Interfaces\RouteParserInterface Der Slim-Router */
 
+/** @var $filters array Filter welche gesetzt sind */
+/** @var $filterSet array Flag ob die Filterzeile angezeigt werden soll */
+
+/** @var $currentUrl string die aktuelle URL */
 /** @var $newUrl string URL um einen neuen Eintrag anzulegen */
 /** @var $detailUrl string URL um die Details eines Eintrag anzuschauen */
 /** @var $copyUrl string URL um einen Eintrag zu kopieren */
 /** @var $deleteUrl string URL um einen Eintrag zu löschen */
 ?>
-<table class="table">
-    <?php $colCount = 0; ?>
-    <tr>
-        <?php foreach ($cols as $col): ?>
-            <th><?=$col['title'] ?></th>
-        <?php endforeach; ?>
-        <th style="width: 120px;"></th>
-    </tr>
-    <tbody>
-    <?php if(count($data) > 0): ?>
-        <?php foreach ($data as $row): ?>
-            <tr>
-                <?php foreach ($cols as $col): ?>
-                    <td><?=$row[$col['alias']] ?></td>
-                <?php endforeach; ?>
-                <td class="icon-cell">
-                    <?php if($detailUrl !== null): ?>
-                        <a href="<?=$router->urlFor($detailUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">create</a>
-                    <?php endif; ?>
-                    <?php if($copyUrl !== null): ?>
-                        <a href="<?=$router->urlFor($copyUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">file_copy</a>
-                    <?php endif; ?>
-                    <?php if($deleteUrl !== null): ?>
-                        <a href="<?=$router->urlFor($deleteUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">delete</a>
-                    <?php endif; ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
+<form action="<?=$currentUrl?>" method="get">
+    <table class="table">
+        <?php $colCount = 0; ?>
         <tr>
-            <td colspan="<?=count($cols) ?>" style="text-align: center;"><i>No data found</i></td>
+            <?php foreach ($cols as $col): ?>
+                <th><?=$col['title'] ?></th>
+            <?php endforeach; ?>
+            <th style="width: 120px; padding: 0; text-align: right; padding-right: 10px">
+                <button type="button" class="btn btn-primary btn-circle material-icons" onclick="toggleFilter()"
+                        id="filter-toggle" <?php if($filterSet): ?>data-filter-display="table-row"<?php endif; ?>>
+                    search
+                </button>
+            </th>
         </tr>
-    <?php endif; ?>
-    </tbody>
+        <tbody>
+        <tr id="filter-row" <?php if(!$filterSet): ?>style="display: none;"<?php endif; ?>>
+            <?php foreach ($cols as $col): ?>
+                <td class="filter-input-cell">
+                    <input class="form-control" type="text" id="filter-<?=$col['alias'] ?>" name="filter-<?=$col['alias'] ?>"
+                           value="<?=$filters[$col['alias']] ?>" placeholder="Search">
+                </td>
+            <?php endforeach; ?>
+            <td>
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </td>
+        </tr>
+        <?php if(count($data) > 0): ?>
+            <?php foreach ($data as $row): ?>
+                <tr>
+                    <?php foreach ($cols as $col): ?>
+                        <td><?=$row[$col['alias']] ?></td>
+                    <?php endforeach; ?>
+                    <td class="icon-cell">
+                        <?php if($detailUrl !== null): ?>
+                            <a href="<?=$router->urlFor($detailUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">create</a>
+                        <?php endif; ?>
+                        <?php if($copyUrl !== null): ?>
+                            <a href="<?=$router->urlFor($copyUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">file_copy</a>
+                        <?php endif; ?>
+                        <?php if($deleteUrl !== null): ?>
+                            <a href="<?=$router->urlFor($deleteUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">delete</a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="<?=count($cols) ?>" style="text-align: center;"><i>No data found</i></td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
 
-</table>
+    </table>
+</form>
 
 <?php if($newUrl !== null): ?>
     <a type="button" class="btn btn-primary" href="<?=$router->urlFor($newUrl)?>">New</a>
 <?php endif; ?>
 <a type="button" class="btn btn-primary" href="<?=$router->urlFor('home')?>">Back</a>
+
+<script type="application/javascript">
+    function toggleFilter() {
+        const toggle = document.getElementById('filter-toggle');
+        let display = toggle.dataset.filterDisplay === 'table-row' ? "none" : "table-row";
+
+        document.getElementById('filter-row').style.display = display;
+        toggle.dataset.filterDisplay = display;
+
+    }
+</script>

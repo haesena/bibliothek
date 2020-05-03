@@ -7,7 +7,7 @@ use Psr\Container\ContainerInterface;
 class BookController extends Controller {
 
     public function getBooks($request, $response, $args) {
-        $table = new \Table($this->db, $this->view);
+        $table = new \Table($this->db, $this->view, $request, $response);
         $table->setUrls('book');
         $table
             ->setDBTable("book", "b")
@@ -28,7 +28,7 @@ class BookController extends Controller {
             'mainTitle' => 'Books'
         ];
 
-        return $table->printTable($response, $templateValues);
+        return $table->printTable($templateValues);
     }
     
     public function newBook($request, $response, $args) {
