@@ -1,4 +1,5 @@
 .DS_Store
 src/vendor
+.idea
 @eaDir
 config.txt
