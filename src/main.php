@@ -5,6 +5,8 @@
  * Beispiel: http://www.slimframework.com/docs/v3/tutorial/first-app.html
  */
 
+// Start the session
+session_start();
 
 require __DIR__ . '/vendor/autoload.php';
 

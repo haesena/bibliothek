@@ -20,7 +20,7 @@ class BookController extends Controller {
             ->addColum("b.title", "Title")
             ->addColum("b.published_year", "Year")
             ->addColum("b.language", "Language")
-            ->addColum("CONCAT(g.genre, ' - ', g.sub_genre)", "Genre")
+            ->addColum("CONCAT(g.genre, COALESCE(CONCAT(' - ', g.sub_genre), ''))", "Genre")
             ->addColum("CONCAT(l.location, ' - ', l.room, ' - ', l.storage)", "Location");
 
         // Vairablen welche dem HTML übergeben werden sollen
@@ -127,6 +127,7 @@ class BookController extends Controller {
         $values = [
             'title' => $body['title'],
             'author' => $body['author'],
+            'language' => $body['language'],
             'published_year' => $body['year'],
             'loc_id' => $body['location'] ?? null,
             'genre_id' => $body['genre'] ?? null,

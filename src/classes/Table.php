@@ -27,6 +27,11 @@ class Table {
 	/** @var \Slim\Psr7\Response */
     private $response;
 
+    /** @var string key for the session entries of this table */
+    private $sessionPath = null;
+
+    private $session = [];
+
     /**
      * Table constructor.
      * @param Database $database
@@ -42,8 +47,20 @@ class Table {
 		$this->request = $request;
 		$this->response = $response;
 
+		$this->sessionPath = 'tbl_ctrl_' . $request->getUri()->getPath();
+		$this->session = $_SESSION[$this->sessionPath];
+
         $this->view->addAttribute('currentUrl', $request->getAttribute('route'));
 	}
+
+	private function debug($val, $title = null) {
+	    if($title) {
+	        print "<b>$title</b>";
+        }
+	    print "<pre>";
+	    print_r($val);
+        print "</pre>";
+    }
 
 	public function setUrls($urlBase) {
         $this->view->addAttribute('newUrl', $this->getUrl($urlBase, 'new'));
@@ -75,8 +92,10 @@ class Table {
      * @param string $alias
      * @param string $joinCondition
      */
-    public function addJoin($dbTable, $alias, $joinCondition) {
-	    $this->joins[]= "JOIN {$dbTable} AS {$alias} ON {$joinCondition}";
+    public function addJoin($dbTable, $alias, $joinCondition, $leftJoin = true) {
+        $join = $leftJoin ? "LEFT JOIN" : "JOIN";
+
+	    $this->joins[]= "{$join} {$dbTable} AS {$alias} ON {$joinCondition}";
 	    return $this;
     }
 
@@ -116,7 +135,12 @@ class Table {
             $sql.= " WHERE ".implode(" AND ", $filter);
         }
 
+        // Anzahl Datensätze zählen
+        $countSQL = str_replace("SELECT {$collist}", "SELECT COUNT(*)", $sql);
+        $count = $this->db->selectValue($countSQL, $filterValues);
+
         $data = $this->db->select($sql, $filterValues);
+
         return $data;
     }
 
@@ -128,13 +152,26 @@ class Table {
         $queryParams = $this->request->getQueryParams();
         foreach($this->columns as $col) {
             $filterCol = "filter-".$col['alias'];
-            if(strlen($queryParams[$filterCol]) === 0) {
+
+            $filterVal = null;
+
+            if(isset($queryParams[$filterCol])) {
+                $filterVal = $queryParams[$filterCol];
+            } elseif(isset($this->session['filter'][$filterCol])) {
+                $filterVal = $this->session['filter'][$filterCol];
+            }
+
+            if(strlen($filterVal) === 0) {
+                unset($this->session['filter'][$filterCol]);
                 continue;
             }
-            $filterValues[":filter_{$col['alias']}"] = "%".$queryParams[$filterCol]."%";
+
+            $this->session['filter'][$filterCol] = $filterVal;
+
+            $filterValues[":filter_{$col['alias']}"] = "%".$filterVal."%";
             $filter[]= "CAST({$col['sql']} AS CHAR(255)) LIKE :filter_{$col['alias']}";
 
-            $this->columnFilter[$col['alias']] = $queryParams[$filterCol];
+            $this->columnFilter[$col['alias']] = $filterVal;
         }
 
         return [$filter, $filterValues];
@@ -150,6 +187,8 @@ class Table {
         $templateValues['cols'] = $this->columns;
         $templateValues['filters'] = $this->columnFilter;
         $templateValues['filterSet'] = count($this->columnFilter) > 0;
+
+        $_SESSION[$this->sessionPath] = $this->session;
 
         // HTML-View anzeigen
         return $this->view->render($this->response, 'table.phtml', $templateValues);
