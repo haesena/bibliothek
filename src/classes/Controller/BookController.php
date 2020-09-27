@@ -125,12 +125,13 @@ class BookController extends Controller {
         $body = $request->getParsedBody();
 
         $values = [
+            'isbn' => $body['isbn'] ?? null,
             'title' => $body['title'],
             'author' => $body['author'],
             'language' => $body['language'],
             'published_year' => $body['year'],
             'loc_id' => $body['location'] ?? null,
-            'genre_id' => $body['genre'] ?? null,
+            'genre_id' => $body['genre'] ?? null
         ];
 
         if(is_numeric($body['id'])) {

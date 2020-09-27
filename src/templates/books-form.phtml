@@ -1,6 +1,12 @@
+
+
 <div class="card form-card">
 	<div class="card-body">
 		<form action="<?=$router->urlFor('book-save')?>" method="post">
+            <div class="form-group">
+                <label for="input-isbn" class="bmd-label-floating">ISBN</label>
+                <input class="form-control" type="text" id="input-isbn" name="isbn" value="<?=$book['isbn'] ?>" onblur="searchByISBN(this.value)">
+            </div>
 
 			<div class="form-group">
 				<label for="input-title" class="bmd-label-floating">Title</label>
@@ -62,3 +68,46 @@
 		</form>
 	</div>
 </div>
+
+<script type="application/javascript">
+    function searchByISBN(isbn) {
+        const requestUrl = 'https://openlibrary.org/api/books?bibkeys=ISBN:' + isbn + '&format=json&jscmd=data';
+
+        fetch(requestUrl).then(function (response) {
+            response.json().then(result => {
+                const book = result['ISBN:' + isbn];
+                if(book) {
+                    parseBook(book);
+                } else {
+                }
+            });
+        }).catch(function (err) {
+            console.warn('Something went wrong.', err);
+        });
+    }
+
+    function parseBook(book) {
+        console.log('book:', book);
+
+        setValue('input-title', book.title);
+
+        if(book.authors) {
+            let authors = [];
+            for (var i = 0; i < book.authors.length; i++) {
+                authors.push(book.authors[i].name);
+            }
+            setValue('input-author', authors);
+        }
+
+        if(book.publish_date) {
+            setValue('input-year', book.publish_date.substr(0, 4));
+        }
+
+    }
+
+    function setValue(id, value) {
+        const input = document.getElementById(id);
+        input.value = value;
+        input.dispatchEvent(new Event('change'));
+    }
+</script>

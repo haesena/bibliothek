@@ -21,6 +21,8 @@ class Table {
 	/** @var array  */
 	private $columnFilter = [];
 
+	/** @var array Pagination-Info */
+	private $pagination = [];
 
 	/** @var \Slim\Psr7\Request */
 	private $request;
@@ -52,6 +54,25 @@ class Table {
 
         $this->view->addAttribute('currentUrl', $request->getAttribute('route'));
 	}
+
+    /**
+     * @param $control string Name des Contorl welcher ermittelt werden soll
+     * @param $sessionType string Typ mit welcher dieser Control in die Session gespeichert wird
+     * @param null $std Standardwert falls Control weder im Request noch in der Session vorhanden ist
+     * @return mixed|null
+     */
+    private function getControl($control, $sessionType, $std = null) {
+        $queryParams = $this->request->getQueryParams();
+
+        if(isset($queryParams[$control])) {
+            $this->session[$sessionType][$control] = $queryParams[$control];
+            return $queryParams[$control];
+        } elseif(isset($this->session[$sessionType][$control])) {
+            return $this->session[$sessionType][$control];
+        } else {
+            return $std;
+        }
+    }
 
 	private function debug($val, $title = null) {
 	    if($title) {
@@ -137,11 +158,33 @@ class Table {
 
         // Anzahl Datensätze zählen
         $countSQL = str_replace("SELECT {$collist}", "SELECT COUNT(*)", $sql);
-        $count = $this->db->selectValue($countSQL, $filterValues);
+        $this->pagination['count'] = $this->db->selectValue($countSQL, $filterValues);
+
+        $sql.= $this->getPagination();
 
         $data = $this->db->select($sql, $filterValues);
 
         return $data;
+    }
+
+    private function getPagination() {
+
+        $limit = $this->getControl('limit', 'pagination', 10);
+        $offset = $this->getControl('offset', 'pagination', 0);
+
+        $this->pagination['limit'] = $limit;
+        $this->pagination['offset'] = $offset;
+
+        $url = $this->request->getAttribute('route');
+
+        $this->pagination['previous'] = $url . "?limit={$limit}&offset=".($offset - $limit);
+        $this->pagination['next'] = $url . "?limit={$limit}&offset=".($offset + $limit);
+
+        if($limit > 0) {
+            return " LIMIT $limit OFFSET $offset";
+        } else {
+            return "";
+        }
     }
 
     private function getFilterSQL() {
@@ -153,13 +196,7 @@ class Table {
         foreach($this->columns as $col) {
             $filterCol = "filter-".$col['alias'];
 
-            $filterVal = null;
-
-            if(isset($queryParams[$filterCol])) {
-                $filterVal = $queryParams[$filterCol];
-            } elseif(isset($this->session['filter'][$filterCol])) {
-                $filterVal = $this->session['filter'][$filterCol];
-            }
+            $filterVal = $this->getControl($filterCol, 'filter');
 
             if(strlen($filterVal) === 0) {
                 unset($this->session['filter'][$filterCol]);
@@ -186,6 +223,7 @@ class Table {
         $templateValues['data'] = $data;
         $templateValues['cols'] = $this->columns;
         $templateValues['filters'] = $this->columnFilter;
+        $templateValues['pagination'] = $this->pagination;
         $templateValues['filterSet'] = count($this->columnFilter) > 0;
 
         $_SESSION[$this->sessionPath] = $this->session;

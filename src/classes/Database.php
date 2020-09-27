@@ -75,6 +75,10 @@ class Database {
 		$updateValues = [];
 		foreach($values as $col => $value) {
 			$updateValues[]= $col." = ?";
+
+			if($value === '') {
+                $values[$col] = NULL;
+            }
 		}
 
 		$sql = "UPDATE ".$table." SET ".implode(', ', $updateValues)." WHERE ".$where;

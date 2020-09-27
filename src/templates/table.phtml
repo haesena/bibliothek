@@ -4,74 +4,118 @@
 /** @var $router \Slim\Interfaces\RouteParserInterface Der Slim-Router */
 
 /** @var $filters array Filter welche gesetzt sind */
-/** @var $filterSet array Flag ob die Filterzeile angezeigt werden soll */
+/** @var $filterSet bool Flag ob die Filterzeile angezeigt werden soll */
 
+/** @var $pagination array Pagination-Informationen */
+
+/** @var $deleteUrl string URL um einen Eintrag zu löschen */
 /** @var $currentUrl string die aktuelle URL */
 /** @var $newUrl string URL um einen neuen Eintrag anzulegen */
 /** @var $detailUrl string URL um die Details eines Eintrag anzuschauen */
 /** @var $copyUrl string URL um einen Eintrag zu kopieren */
 /** @var $deleteUrl string URL um einen Eintrag zu löschen */
 ?>
-<form action="<?=$currentUrl?>" method="get">
+
+<form action="<?= $currentUrl ?>" method="get">
     <table class="table">
         <?php $colCount = 0; ?>
         <tr>
             <?php foreach ($cols as $col): ?>
-                <th><?=$col['title'] ?></th>
+                <th><?= $col['title'] ?></th>
             <?php endforeach; ?>
             <th style="width: 120px; padding: 0; text-align: right; padding-right: 10px">
                 <button type="button" class="btn btn-primary btn-circle material-icons" onclick="toggleFilter()"
-                        id="filter-toggle" <?php if($filterSet): ?>data-filter-display="table-row"<?php endif; ?>>
+                        id="filter-toggle" <?php if ($filterSet): ?>data-filter-display="table-row"<?php endif; ?>>
                     search
                 </button>
+
+                <a href="<?= $router->urlFor($newUrl) ?>" class="btn btn-primary btn-circle material-icons">add</a>
             </th>
         </tr>
         <tbody>
-        <tr id="filter-row" <?php if(!$filterSet): ?>style="display: none;"<?php endif; ?>>
+        <tr id="filter-row" <?php if (!$filterSet): ?>style="display: none;"<?php endif; ?>>
             <?php foreach ($cols as $col): ?>
                 <td class="filter-input-cell">
-                    <input class="form-control" type="text" id="filter-<?=$col['alias'] ?>" name="filter-<?=$col['alias'] ?>"
-                           value="<?=$filters[$col['alias']] ?>" placeholder="Search">
+                    <input class="form-control" type="text" id="filter-<?= $col['alias'] ?>"
+                           name="filter-<?= $col['alias'] ?>"
+                           value="<?= $filters[$col['alias']] ?>" placeholder="Search">
                 </td>
             <?php endforeach; ?>
             <td>
                 <button type="submit" class="btn btn-primary">Filter</button>
             </td>
         </tr>
-        <?php if(count($data) > 0): ?>
+        <?php if (count($data) > 0): ?>
             <?php foreach ($data as $row): ?>
                 <tr>
                     <?php foreach ($cols as $col): ?>
-                        <td><?=$row[$col['alias']] ?></td>
+                        <td><?= $row[$col['alias']] ?></td>
                     <?php endforeach; ?>
                     <td class="icon-cell">
-                        <?php if($detailUrl !== null): ?>
-                            <a href="<?=$router->urlFor($detailUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">create</a>
+                        <?php if ($detailUrl !== null): ?>
+                            <a href="<?= $router->urlFor($detailUrl, ['id' => $row['id']]) ?>"
+                               class="btn btn-primary btn-circle material-icons">create</a>
                         <?php endif; ?>
-                        <?php if($copyUrl !== null): ?>
-                            <a href="<?=$router->urlFor($copyUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">file_copy</a>
+                        <?php if ($copyUrl !== null): ?>
+                            <a href="<?= $router->urlFor($copyUrl, ['id' => $row['id']]) ?>"
+                               class="btn btn-primary btn-circle material-icons">file_copy</a>
                         <?php endif; ?>
-                        <?php if($deleteUrl !== null): ?>
-                            <a href="<?=$router->urlFor($deleteUrl, ['id' => $row['id']])?>" class="btn btn-primary btn-circle material-icons">delete</a>
+                        <?php if ($deleteUrl !== null): ?>
+                            <a href="<?= $router->urlFor($deleteUrl, ['id' => $row['id']]) ?>"
+                               class="btn btn-primary btn-circle material-icons">delete</a>
                         <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
             <tr>
-                <td colspan="<?=count($cols) ?>" style="text-align: center;"><i>No data found</i></td>
+                <td colspan="<?= count($cols) ?>" style="text-align: center;"><i>No data found</i></td>
             </tr>
         <?php endif; ?>
         </tbody>
 
     </table>
 </form>
+<div class="footer-div">
+    <span>
+        <?php if ($newUrl !== null): ?>
+            <a type="button" class="btn btn-primary" href="<?= $router->urlFor($newUrl) ?>">New</a>
+        <?php endif; ?>
+        <a type="button" class="btn btn-primary" href="<?= $router->urlFor('home') ?>">Back</a>
+    </span>
+    <span class="spacer"></span>
+    <span>
+        <?php if ($pagination['offset'] > 0): ?>
+            <a href="<?= $pagination['previous'] ?>" class="btn btn-primary btn-circle material-icons">navigate_before</a>
+        <?php else: ?>
+            <button type="button" class="btn btn-primary btn-circle material-icons" disabled>navigate_before</button>
+        <?php endif; ?>
 
-<?php if($newUrl !== null): ?>
-    <a type="button" class="btn btn-primary" href="<?=$router->urlFor($newUrl)?>">New</a>
-<?php endif; ?>
-<a type="button" class="btn btn-primary" href="<?=$router->urlFor('home')?>">Back</a>
 
+        <?php if ($pagination['limit'] > 0): ?>
+            <?= $pagination['offset'] + 1 ?> - <?= min($pagination['offset'] + $pagination['limit'], $pagination['count']) ?>
+        <?php else: ?>
+            all
+        <?php endif; ?>
+        of <?= $pagination['count'] ?>
+
+        <?php if ($pagination['offset'] + $pagination['limit'] < $pagination['count']): ?>
+            <a href="<?= $pagination['next'] ?>" class="btn btn-primary btn-circle material-icons">navigate_next</a>
+        <?php else: ?>
+            <button type="button" class="btn btn-primary btn-circle material-icons" disabled>navigate_next</button>
+        <?php endif; ?>
+
+        Items:
+        <select class="form-control" id="pagination-limit" name="genre" style="width: auto; display: inline-block;"
+                onchange="window.location = '<?= $currentUrl ?>?offset=0&limit=' + this.value;">
+            <option value="10" label="10" <?php if($pagination['limit'] == 10): ?>selected <?php endif; ?>>10</option>
+            <option value="20" label="20" <?php if($pagination['limit'] == 20): ?>selected <?php endif; ?>>20</option>
+            <option value="50" label="50" <?php if($pagination['limit'] == 50): ?>selected <?php endif; ?>>50</option>
+            <option value="100" label="100" <?php if($pagination['limit'] == 100): ?>selected <?php endif; ?>>100</option>
+            <option value="0" label="all" <?php if($pagination['limit'] == 0): ?>selected <?php endif; ?>>all</option>
+        </select>
+    </span>
+</div>
 <script type="application/javascript">
     function toggleFilter() {
         const toggle = document.getElementById('filter-toggle');
@@ -79,6 +123,5 @@
 
         document.getElementById('filter-row').style.display = display;
         toggle.dataset.filterDisplay = display;
-
     }
 </script>
