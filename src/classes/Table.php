@@ -125,11 +125,18 @@ class Table {
         return $this;
     }
 
-	public function addColum($dbSelect, $colTitle) {
+	public function addColum($dbSelect, $colTitle, $responsiveSizes = []) {
+
+        $cssClasses = "";
+        foreach($responsiveSizes as $size) {
+            $cssClasses.= " col-screen-".$size;
+        }
+
 		$this->columns[]= [
 		    'sql' => $dbSelect,
             'title'=> $colTitle,
-            'alias' => "col".count($this->columns)
+            'alias' => "col".count($this->columns),
+            'css' => $cssClasses
         ];
 		return $this;
 	}

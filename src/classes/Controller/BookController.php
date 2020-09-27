@@ -18,10 +18,10 @@ class BookController extends Controller {
 
             ->addColum("b.author", "Author")
             ->addColum("b.title", "Title")
-            ->addColum("b.published_year", "Year")
-            ->addColum("b.language", "Language")
-            ->addColum("CONCAT(g.genre, COALESCE(CONCAT(' - ', g.sub_genre), ''))", "Genre")
-            ->addColum("CONCAT(l.location, ' - ', l.room, ' - ', l.storage)", "Location");
+            ->addColum("b.published_year", "Year", ['xl'])
+            ->addColum("b.language", "Language", ['xl'])
+            ->addColum("CONCAT(g.genre, COALESCE(CONCAT(' - ', g.sub_genre), ''))", "Genre", ['l'])
+            ->addColum("CONCAT(l.location, ' - ', l.room, ' - ', l.storage)", "Location", ['xl']);
 
         // Vairablen welche dem HTML übergeben werden sollen
         $templateValues = [

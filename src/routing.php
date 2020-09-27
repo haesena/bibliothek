@@ -9,7 +9,7 @@ $app->get('/locations/{id}', Controller\LocationController::class . ':getSingleL
 $app->get('/locations/{id}/delete', Controller\LocationController::class . ':deleteLocation')->setName('location-delete');
 $app->get('/locations/{id}/copy', Controller\LocationController::class . ':copyLocation')->setName('location-copy');
 
-$app->get('/books', Controller\BookController::class . ':getBooks')->setName('book-list');
+$app->get('/books', Controller\BookController::class . ':getBooks')->setName('books');
 $app->get('/books/new', Controller\BookController::class . ':newBook')->setName('book-new');
 $app->post('/books/save', Controller\BookController::class . ':saveBook')->setName('book-save');
 $app->get('/books/{id}', Controller\BookController::class . ':getSingleBook')->setName('book-detail');

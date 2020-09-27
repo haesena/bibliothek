@@ -1,13 +1,13 @@
 body {
-	margin: 0;
+    margin: 0;
 }
 
 .main-content {
-	padding: 15px;
+    padding: 15px;
 }
 
 .table {
-	background-color: #fff;
+    background-color: #fff;
     border-radius: 4px;
     border-width: 1px;
     border-style: solid;
@@ -15,12 +15,15 @@ body {
 }
 
 .table td.icon-cell {
-	padding: 0px;
+    padding: 0px;
+    padding-right: 10px;
+    text-align: right;
+
 }
 
 .form-card {
     max-width: 700px;
-	margin: 0 auto;
+    margin: 0 auto;
     float: none;
     margin-bottom: 10px;
 }
@@ -33,7 +36,7 @@ body {
     text-align: center;
     font-size: 24px;
     line-height: 0.8;
-	margin-top: 0.46875rem;
+    margin-top: 0.46875rem;
 }
 
 .footer-div {
@@ -42,4 +45,19 @@ body {
 
 .spacer {
     flex: 1 1 auto;
+}
+
+@media only screen and (max-width: 800px) {
+    .col-screen-xl {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .col-screen-xl {
+        display: none;
+    }
+    .col-screen-l {
+        display: none;
+    }
 }
